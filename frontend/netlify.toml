@@ -1,0 +1,3 @@
+[build]
+  command = "CI=false yarn run build"
+  publish = "build"
