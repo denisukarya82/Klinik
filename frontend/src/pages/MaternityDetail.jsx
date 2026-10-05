@@ -31,42 +31,79 @@ export default function MaternityDetail() {
   const [data, setData] = useState(null);
   const [ancOpen, setAncOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [anc, setAnc] = useState({ tanggal: "", berat_badan: "", tekanan_darah: "", tinggi_fundus: "", djj: "", keluhan: "", catatan: "", jadwal_berikutnya: "" });
-  const [del, setDel] = useState({ tanggal: "", jenis_persalinan: "Normal", tempat: "Klinik", penolong: "", catatan: "", bayi_nama: "", bayi_jenis_kelamin: "Laki-laki", bayi_berat: "", bayi_panjang: "", apgar: "" });
+  const initialAnc = {
+    tanggal: new Date().toISOString().split("T")[0],
+    berat_badan: "",
+    tekanan_darah: "",
+    tinggi_fundus: "",
+    djj: "",
+    keluhan: "",
+    catatan: "",
+    jadwal_berikutnya: "",
+  };
+
+  const initialDel = {
+    tanggal: new Date().toISOString().split("T")[0],
+    jenis_persalinan: "Normal",
+    tempat: "Klinik",
+    penolong: "",
+    catatan: "",
+    bayi_nama: "",
+    bayi_jenis_kelamin: "Laki-laki",
+    bayi_berat: "",
+    bayi_panjang: "",
+    apgar: "",
+  };
+
+  const [anc, setAnc] = useState(initialAnc);
+  const [del, setDel] = useState(initialDel);
 
   const load = () => api.get(`/pregnancies/${id}`).then((r) => setData(r.data)).catch(() => {});
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (!data) return <div className="text-stone-500">Memuat…</div>;
+  if (!data) return <div className="text-stone-500 p-6">Memuat data kebidanan…</div>;
   const { pregnancy, anc: ancList, deliveries } = data;
 
   const saveAnc = async () => {
+    if (!anc.tanggal) return toast.error("Tanggal pemeriksaan wajib diisi");
+    if (anc.tekanan_darah && !/^\d{2,3}\/\d{2,3}$/.test(anc.tekanan_darah.trim())) {
+      return toast.error("Format tekanan darah harus sistol/diastol, misal: 120/80");
+    }
+
+    setIsSubmitting(true);
     try {
       await api.post("/anc", {
         pregnancy_id: id,
         tanggal: anc.tanggal,
         berat_badan: Number(anc.berat_badan) || 0,
-        tekanan_darah: anc.tekanan_darah,
+        tekanan_darah: anc.tekanan_darah.trim(),
         tinggi_fundus: Number(anc.tinggi_fundus) || 0,
-        djj: anc.djj,
+        djj: anc.djj ? String(anc.djj) : "",
         keluhan: anc.keluhan,
         catatan: anc.catatan,
-        jadwal_berikutnya: anc.jadwal_berikutnya,
+        jadwal_berikutnya: anc.jadwal_berikutnya || null,
       });
       toast.success("Pemeriksaan ANC tersimpan");
       setAncOpen(false);
-      setAnc({ tanggal: "", berat_badan: "", tekanan_darah: "", tinggi_fundus: "", djj: "", keluhan: "", catatan: "", jadwal_berikutnya: "" });
+      setAnc(initialAnc);
       load();
     } catch {
-      toast.error("Gagal menyimpan");
+      toast.error("Gagal menyimpan data ANC");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const saveDelivery = async () => {
+    if (!del.tanggal) return toast.error("Tanggal persalinan wajib diisi");
+
+    setIsSubmitting(true);
     try {
       await api.post("/deliveries", {
         pregnancy_id: id,
@@ -83,9 +120,12 @@ export default function MaternityDetail() {
       });
       toast.success("Data persalinan tersimpan");
       setDelOpen(false);
+      setDel(initialDel);
       load();
     } catch {
-      toast.error("Gagal menyimpan");
+      toast.error("Gagal menyimpan data persalinan");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -210,16 +250,16 @@ export default function MaternityDetail() {
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-2">
             <div>
-              <Label>Tanggal</Label>
+              <Label>Tanggal *</Label>
               <Input type="date" value={anc.tanggal} onChange={sa("tanggal")} className="mt-1.5" data-testid="anc-tanggal" />
             </div>
             <div>
               <Label>Berat Badan (kg)</Label>
-              <Input type="number" value={anc.berat_badan} onChange={sa("berat_badan")} className="mt-1.5" />
+              <Input type="number" step="0.1" value={anc.berat_badan} onChange={sa("berat_badan")} className="mt-1.5" />
             </div>
             <div>
-              <Label>Tekanan Darah</Label>
-              <Input value={anc.tekanan_darah} onChange={sa("tekanan_darah")} placeholder="cth: 120/80" className="mt-1.5" />
+              <Label>Tekanan Darah (cth: 120/80)</Label>
+              <Input value={anc.tekanan_darah} onChange={sa("tekanan_darah")} placeholder="120/80" className="mt-1.5" />
             </div>
             <div>
               <Label>Tinggi Fundus (cm)</Label>
@@ -227,7 +267,7 @@ export default function MaternityDetail() {
             </div>
             <div>
               <Label>DJJ (bpm)</Label>
-              <Input value={anc.djj} onChange={sa("djj")} placeholder="cth: 140" className="mt-1.5" />
+              <Input type="number" value={anc.djj} onChange={sa("djj")} placeholder="cth: 140" className="mt-1.5" />
             </div>
             <div>
               <Label>Kontrol Berikutnya</Label>
@@ -244,7 +284,9 @@ export default function MaternityDetail() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAncOpen(false)}>Batal</Button>
-            <Button onClick={saveAnc} className="bg-primary hover:bg-[#47644D]" data-testid="save-anc-button">Simpan</Button>
+            <Button onClick={saveAnc} disabled={isSubmitting} className="bg-primary hover:bg-[#47644D]" data-testid="save-anc-button">
+              {isSubmitting ? "Menyimpan..." : "Simpan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -257,68 +299,10 @@ export default function MaternityDetail() {
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-2">
             <div>
-              <Label>Tanggal</Label>
+              <Label>Tanggal *</Label>
               <Input type="date" value={del.tanggal} onChange={sd("tanggal")} className="mt-1.5" data-testid="delivery-tanggal" />
             </div>
             <div>
               <Label>Jenis Persalinan</Label>
               <Select value={del.jenis_persalinan} onValueChange={(v) => setDel((f) => ({ ...f, jenis_persalinan: v }))}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Normal">Normal (Spontan)</SelectItem>
-                  <SelectItem value="SC">Sectio Caesarea (SC)</SelectItem>
-                  <SelectItem value="Vakum">Vakum</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Tempat</Label>
-              <Input value={del.tempat} onChange={sd("tempat")} className="mt-1.5" />
-            </div>
-            <div>
-              <Label>Penolong</Label>
-              <Input value={del.penolong} onChange={sd("penolong")} className="mt-1.5" />
-            </div>
-            <div className="col-span-2 border-t border-stone-100 pt-3 mt-1">
-              <p className="text-sm font-semibold text-stone-700">Data Bayi</p>
-            </div>
-            <div>
-              <Label>Nama Bayi</Label>
-              <Input value={del.bayi_nama} onChange={sd("bayi_nama")} className="mt-1.5" />
-            </div>
-            <div>
-              <Label>Jenis Kelamin</Label>
-              <Select value={del.bayi_jenis_kelamin} onValueChange={(v) => setDel((f) => ({ ...f, bayi_jenis_kelamin: v }))}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Laki-laki">Laki-laki</SelectItem>
-                  <SelectItem value="Perempuan">Perempuan</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Berat (gram)</Label>
-              <Input type="number" value={del.bayi_berat} onChange={sd("bayi_berat")} className="mt-1.5" />
-            </div>
-            <div>
-              <Label>Panjang (cm)</Label>
-              <Input type="number" value={del.bayi_panjang} onChange={sd("bayi_panjang")} className="mt-1.5" />
-            </div>
-            <div>
-              <Label>APGAR Score</Label>
-              <Input value={del.apgar} onChange={sd("apgar")} placeholder="cth: 9/10" className="mt-1.5" />
-            </div>
-            <div className="col-span-2">
-              <Label>Catatan</Label>
-              <Textarea value={del.catatan} onChange={sd("catatan")} rows={2} className="mt-1.5" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDelOpen(false)}>Batal</Button>
-            <Button onClick={saveDelivery} className="bg-primary hover:bg-[#47644D]" data-testid="save-delivery-button">Simpan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+                <SelectTrigger className
