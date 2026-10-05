@@ -44,8 +44,9 @@ export default function Billing() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
-
+  
   const pay = async () => {
     try {
       await api.post(`/invoices/${detail.id}/pay`, { metode_bayar: metode });
