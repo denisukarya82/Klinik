@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, .font-head {
+    font-family: 'Outfit', system-ui, sans-serif;
+}
+
+@layer base {
+    :root {
+        --background: 40 20% 97%;
+        --foreground: 24 10% 10%;
+        --card: 0 0% 100%;
+        --card-foreground: 24 10% 10%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 24 10% 10%;
+        --primary: 133 16% 42%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 42 20% 92%;
+        --secondary-foreground: 24 10% 15%;
+        --muted: 42 18% 93%;
+        --muted-foreground: 25 6% 40%;
+        --accent: 125 24% 93%;
+        --accent-foreground: 133 20% 28%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 20 9% 89%;
+        --input: 20 9% 88%;
+        --ring: 133 16% 42%;
+        --chart-1: 133 16% 42%;
+        --chart-2: 11 60% 63%;
+        --chart-3: 197 37% 34%;
+        --chart-4: 43 64% 56%;
+        --chart-5: 280 30% 55%;
+        --radius: 0.6rem;
+        --sidebar: 42 22% 92%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+    ::selection {
+        background: hsl(133 16% 42% / 0.18);
+    }
+}
+
+.sidebar-bg { background-color: hsl(var(--sidebar)); }
+
+.nav-link {
+    transition-property: background-color, color;
+    transition-duration: 150ms;
+}
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fade-up 0.4s ease-out both; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: hsl(20 9% 80%); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }

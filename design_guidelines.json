@@ -1,0 +1,97 @@
+{
+  "theme": "light",
+  "archetype": "ORGANIC & EARTHY",
+  "typography": {
+    "fonts": {
+      "headings": "Outfit",
+      "body": "Plus Jakarta Sans"
+    },
+    "scale": {
+      "h1": "text-4xl sm:text-5xl tracking-tight leading-none text-stone-900 font-medium",
+      "h2": "text-2xl sm:text-3xl tracking-tight text-stone-800 font-medium",
+      "h3": "text-xl sm:text-2xl tracking-tight text-stone-800 font-medium",
+      "h4": "text-lg text-stone-800 font-medium",
+      "body": "text-base leading-relaxed text-stone-600",
+      "labels": "text-xs tracking-[0.2em] uppercase text-stone-500 font-medium"
+    }
+  },
+  "colors": {
+    "primary": "#5B7C62",
+    "primary_hover": "#47644D",
+    "primary_light": "#E9F0EA",
+    "accent_terracotta": "#D97B66",
+    "background_app": "#F9F8F6",
+    "background_card": "#FFFFFF",
+    "background_sidebar": "#F2EFE9",
+    "text_primary": "#1C1917",
+    "text_secondary": "#57534E",
+    "border_color": "#E7E5E4"
+  },
+  "visual_enhancers": {
+    "surface": "Flat Solid. No Glassmorphism for clinical apps. Warm solid backgrounds (e.g., white or stone-50) with 1px subtle borders (border-stone-200).",
+    "shadows": "Minimal. Avoid heavy drop shadows. Use shadow-sm for subtle lifts on hover.",
+    "radius": "Subtle roundness. Use rounded-lg (8px) for cards and inputs."
+  },
+  "grids": {
+    "dashboard": "High Density Grid (Mode B). grid-cols-1 md:grid-cols-3 lg:grid-cols-4 with gap-4 or gap-6."
+  },
+  "layouts": {
+    "spacing": "Generous Spacing Philosophy. Use p-6 or p-8 inside containers to allow breathing room despite high data density.",
+    "alignment": "Optical alignment over geometrical. Left-align dense content, tables, and forms."
+  },
+  "component_path": {
+    "general": "Use Shadcn components in JS. Override default border colors to stone-200 and primary colors to custom Sage.",
+    "cards": "Flat solid cards, e.g., bg-white border border-stone-200 rounded-lg p-6",
+    "navigation": "Sidebar layout for desktop, hamburger for mobile. Sidebar should have distinct background (#F2EFE9)."
+  },
+  "motion": {
+    "interactions": "Micro-interactions for feedback. Fast, crisp transitions.",
+    "page_transitions": "Staggered fade-ins for dashboard widgets (opacity 0 to 1, y 10 to 0)."
+  },
+  "accessibility": {
+    "contrast": "Text on primary color must be white. Ensure WCAG AA compliance.",
+    "testing": "All interactive and key informational elements MUST include a data-testid attribute (e.g., data-testid='login-submit-button', data-testid='patient-table-row')."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.unsplash.com/photo-1758654860024-9e352f70d1f9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBtZWRpY2FsJTIwY2xpbmljJTIwd2FpdGluZyUyMHJvb20lMjB3YXJtfGVufDB8fHx8MTc5MTIyNTU3NXww&ixlib=rb-4.1.0&q=85",
+      "description": "Warm medical clinic waiting room, used for login page split-screen background",
+      "category": "authentication"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxkb2N0b3IlMjBzdGFmZiUyMHBvcnRyYWl0JTIwd2FybXxlbnwwfHx8fDE3OTEyMjU1NzV8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Warm portrait of a medical staff member, used for user profile avatar placeholder",
+      "category": "user_profile"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1711313532327-2f47602eb6ba?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwyfHxtaWR3aWZlJTIwbWF0ZXJuaXR5JTIwbW90aGVyJTIwY2xpbmljfGVufDB8fHx8MTc5MTIyNTU3NXww&ixlib=rb-4.1.0&q=85",
+      "description": "Close up of maternity/pregnancy care, used for empty states in patient records or maternity section",
+      "category": "empty_states"
+    }
+  ],
+  "3d_libraries": "Not applicable for this context (data-heavy clinical dashboard). Stick to 2D Shadcn charts (Recharts) for dashboard statistics.",
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette. Use the primary Sage color (#5B7C62) for primary actions.",
+    "Implement a clean, sidebar-based dashboard layout. Sidebar should be #F2EFE9 and main content #F9F8F6.",
+    "All components must be written in Javascript (.jsx/.js), not Typescript.",
+    "Use Phosphor Icons (@phosphor-icons/react) for all UI icons.",
+    "Add 'data-testid' to all buttons, links, inputs, and major layout elements.",
+    "Implement forms and tables for Data Pasien, Rekam Medis, Obat/Resep, Kunjungan, and Tagihan exactly as specified, using Rupiah (Rp) for currency formatting.",
+    "Use Shadcn calendar for Antenatal Care (ANC) scheduling.",
+    "Ensure the application language is entirely Indonesian (Bahasa Indonesia) as requested."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "You MUST NOT apply universal transition. Eg: transition: all. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file.",
+    "Always use modern button styles with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Use `sonner` for toasts. Located in /app/frontend/src/components/ui/sonner.jsx or similar js path."
+  ]
+}
