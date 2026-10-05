@@ -36,6 +36,7 @@ export default function Maternity() {
   const [patients, setPatients] = useState([]);
   const [filter, setFilter] = useState("Aktif");
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [patientId, setPatientId] = useState("");
   const [hpht, setHpht] = useState("");
@@ -56,18 +57,29 @@ export default function Maternity() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const save = async () => {
     if (!patientId) return toast.error("Pilih pasien");
     if (!hpht) return toast.error("Isi HPHT (hari pertama haid terakhir)");
+
+    const g = Number(gravida);
+    const p = Number(para);
+    const a = Number(abortus);
+
+    if (g < p + a + 1) {
+      return toast.error("Nilai Gravida (kehamilan sekarang) minimal harus Para + Abortus + 1");
+    }
+
+    setIsSubmitting(true);
     try {
       await api.post("/pregnancies", {
         patient_id: patientId,
         hpht,
-        gravida: Number(gravida),
-        para: Number(para),
-        abortus: Number(abortus),
+        gravida: g,
+        para: p,
+        abortus: a,
         catatan,
       });
       toast.success("Data kehamilan ditambahkan");
@@ -80,7 +92,9 @@ export default function Maternity() {
       setCatatan("");
       load();
     } catch {
-      toast.error("Gagal menyimpan");
+      toast.error("Gagal menyimpan data kehamilan");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,13 +198,20 @@ export default function Maternity() {
             </div>
             <div>
               <Label>HPHT (Hari Pertama Haid Terakhir) *</Label>
-              <Input type="date" value={hpht} onChange={(e) => setHpht(e.target.value)} className="mt-1.5" data-testid="preg-hpht" />
+              <Input
+                type="date"
+                max={new Date().toISOString().split("T")[0]}
+                value={hpht}
+                onChange={(e) => setHpht(e.target.value)}
+                className="mt-1.5"
+                data-testid="preg-hpht"
+              />
               <p className="text-xs text-stone-400 mt-1">HPL & usia kehamilan dihitung otomatis.</p>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label>Gravida</Label>
-                <Input type="number" min={0} value={gravida} onChange={(e) => setGravida(e.target.value)} className="mt-1.5" />
+                <Input type="number" min={1} value={gravida} onChange={(e) => setGravida(e.target.value)} className="mt-1.5" />
               </div>
               <div>
                 <Label>Para</Label>
@@ -208,7 +229,9 @@ export default function Maternity() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-            <Button onClick={save} className="bg-primary hover:bg-[#47644D]" data-testid="save-pregnancy-button">Simpan</Button>
+            <Button onClick={save} disabled={isSubmitting} className="bg-primary hover:bg-[#47644D]" data-testid="save-pregnancy-button">
+              {isSubmitting ? "Menyimpan..." : "Simpan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
