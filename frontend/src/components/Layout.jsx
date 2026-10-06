@@ -35,32 +35,33 @@ export default function Layout() {
   };
 
   const SidebarContent = () => (
-   {/* Header Sidebar: Area Luas & Proporsional */}
-<div className="px-5 pt-6 pb-4 border-b border-stone-200/70">
-  {/* Baris Logo & Judul */}
-  <div className="flex items-center gap-3">
-    <div className="h-11 w-11 shrink-0 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-      <HeartPulse className="h-6 w-6" />
-    </div>
-    <div className="flex flex-col">
-      <p className="font-head font-bold text-stone-900 text-base leading-snug">My Klinik</p>
-      <p className="text-xs text-stone-500 font-medium">Portal Pelayanan Pasien Digital</p>
-    </div>
-  </div>
+    <div className="flex flex-col h-full">
+      {/* Header Sidebar: Area Luas & Proporsional */}
+      <div className="px-5 pt-6 pb-4 border-b border-stone-200/70">
+        {/* Baris Logo & Judul */}
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 shrink-0 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
+            <HeartPulse className="h-6 w-6" />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <p className="font-head font-bold text-stone-900 text-base leading-snug">My Klinik</p>
+            <p className="text-xs text-stone-500 font-medium">Portal Pelayanan Pasien Digital</p>
+          </div>
+        </div>
 
-  {/* Underscore Garis Panjang */}
-  <div className="w-full h-px bg-stone-200 my-4" />
+        {/* Underscore Garis Panjang */}
+        <div className="w-full h-px bg-stone-200 my-3" />
 
-  {/* Area Nama Bidan Luas */}
-  <div className="w-full bg-stone-100/80 rounded-lg p-3 border border-stone-200/60">
-    <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-600 mb-1">
-      Bidan Praktik Mandiri
-    </p>
-    <p className="text-sm font-semibold text-stone-900 leading-snug break-words">
-      Bdn. Nama Lengkap Beserta Seluruh Gelar, S.Tr.Keb., M.Keb
-    </p>
-  </div>
-</div>
+        {/* Area Nama Bidan Luas */}
+        <div className="w-full bg-stone-100/80 rounded-lg p-2.5 border border-stone-200/60">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-0.5">
+            Bidan Praktik Mandiri
+          </p>
+          <p className="text-xs font-semibold text-stone-900 leading-snug break-words">
+            Bdn. Kominasari, S.Tr.Keb.,
+          </p>
+        </div>
+      </div>
 
       {/* Navigasi Menu */}
       <nav className="flex-1 px-3 py-5 space-y-1">
