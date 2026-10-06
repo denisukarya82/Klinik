@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Baby, Stethoscope, Wallet, AlertCircle, Pill } from "lucide-react";
+import { Users, Baby, Stethoscope, Wallet, AlertCircle, Pill, RefreshCw } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,6 +14,7 @@ import { api } from "@/lib/apiClient";
 import { rupiah, tanggalPendek } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const StatCard = ({ icon: Icon, label, value, sub, tint, delay, testid }) => (
   <Card
@@ -24,7 +25,7 @@ const StatCard = ({ icon: Icon, label, value, sub, tint, delay, testid }) => (
     <div className="flex items-start justify-between">
       <div>
         <p className="text-xs uppercase tracking-wider text-stone-500 font-medium">{label}</p>
-        <p className="font-head text-2xl font-semibold text-stone-900 mt-2">{value}</p>
+        <p className="font-head text-2xl font-semibold text-stone-900 mt-2">{value ?? 0}</p>
         {sub && <p className="text-xs text-stone-500 mt-1">{sub}</p>}
       </div>
       <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${tint}`}>
@@ -36,14 +37,49 @@ const StatCard = ({ icon: Icon, label, value, sub, tint, delay, testid }) => (
 
 export default function Dashboard() {
   const [s, setS] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const fetchStats = () => {
+    setLoading(true);
+    setError(null);
+    api.get("/dashboard/stats")
+      .then((r) => {
+        setS(r.data);
+      })
+      .catch((err) => {
+        setError(err.response?.data?.message || err.message || "Gagal memuat data");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
-    api.get("/dashboard/stats").then((r) => setS(r.data)).catch(() => {});
+    fetchStats();
   }, []);
 
-  if (!s)
-    return <div className="text-stone-500">Memuat dashboard…</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-stone-500 py-12">
+        <RefreshCw className="h-4 w-4 animate-spin" />
+        <span>Memuat data dashboard…</span>
+      </div>
+    );
+  }
+
+  if (error || !s) {
+    return (
+      <div className="py-12 text-center max-w-sm mx-auto">
+        <p className="text-red-500 font-medium mb-2">Gagal menampilkan dashboard</p>
+        <p className="text-xs text-stone-500 mb-4">{error || "Koneksi ke backend bermasalah"}</p>
+        <Button onClick={fetchStats} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" /> Coba Lagi
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -80,7 +116,7 @@ export default function Dashboard() {
         <StatCard
           icon={Wallet}
           label="Pendapatan Bulan Ini"
-          value={rupiah(s.revenue_month)}
+          value={rupiah(s.revenue_month || 0)}
           sub="Dari tagihan lunas"
           tint="bg-accent text-primary"
           delay={180}
@@ -93,18 +129,20 @@ export default function Dashboard() {
           <h3 className="font-head text-lg font-semibold text-stone-900 mb-4">
             Kunjungan per Bulan
           </h3>
-          {s.chart.length === 0 ? (
+          {!s.chart || s.chart.length === 0 ? (
             <p className="text-stone-400 text-sm py-12 text-center">Belum ada data kunjungan</p>
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={s.chart}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
-                <XAxis dataKey="bulan" tick={{ fontSize: 12, fill: "#78716c" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: "#78716c" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip cursor={{ fill: "rgba(91,124,98,0.06)" }} />
-                <Bar dataKey="kunjungan" fill="#5B7C62" radius={[6, 6, 0, 0]} maxBarSize={48} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="w-full h-[260px] min-w-0">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                <BarChart data={s.chart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
+                  <XAxis dataKey="bulan" tick={{ fontSize: 12, fill: "#78716c" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: "#78716c" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip cursor={{ fill: "rgba(91,124,98,0.06)" }} />
+                  <Bar dataKey="kunjungan" fill="#5B7C62" radius={[6, 6, 0, 0]} maxBarSize={48} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </Card>
 
@@ -115,16 +153,16 @@ export default function Dashboard() {
               <span className="text-sm font-medium">Tagihan Belum Lunas</span>
             </div>
             <p className="font-head text-2xl font-semibold text-stone-900 mt-2">
-              {rupiah(s.unpaid_total)}
+              {rupiah(s.unpaid_total || 0)}
             </p>
-            <p className="text-xs text-stone-500 mt-1">{s.unpaid_count} tagihan menunggu pembayaran</p>
+            <p className="text-xs text-stone-500 mt-1">{s.unpaid_count || 0} tagihan menunggu pembayaran</p>
           </Card>
           <Card className="p-5 border-stone-200 fade-up" style={{ animationDelay: "300ms" }}>
             <div className="flex items-center gap-2 text-stone-700">
               <Pill className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">Jenis Obat Tersedia</span>
             </div>
-            <p className="font-head text-2xl font-semibold text-stone-900 mt-2">{s.total_drugs}</p>
+            <p className="font-head text-2xl font-semibold text-stone-900 mt-2">{s.total_drugs || 0}</p>
             <p className="text-xs text-stone-500 mt-1">Item dalam daftar obat</p>
           </Card>
         </div>
@@ -132,7 +170,7 @@ export default function Dashboard() {
 
       <Card className="mt-6 p-6 border-stone-200 fade-up" style={{ animationDelay: "340ms" }}>
         <h3 className="font-head text-lg font-semibold text-stone-900 mb-4">Kunjungan Terbaru</h3>
-        {s.recent_visits.length === 0 ? (
+        {!s.recent_visits || s.recent_visits.length === 0 ? (
           <p className="text-stone-400 text-sm py-8 text-center">Belum ada kunjungan</p>
         ) : (
           <div className="divide-y divide-stone-100">
@@ -150,7 +188,7 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-stone-700">{rupiah(v.total)}</span>
+                  <span className="text-sm font-medium text-stone-700">{rupiah(v.total || 0)}</span>
                   <Badge
                     variant={v.status_bayar === "Lunas" ? "default" : "secondary"}
                     className={v.status_bayar === "Lunas" ? "bg-primary" : "bg-amber-100 text-amber-700"}
