@@ -36,15 +36,22 @@ export default function Layout() {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="px-6 py-6 flex items-center gap-3 border-b border-stone-200/70">
-        <div className="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
+      {/* Header Sidebar dengan Badge Nama Bidan */}
+      <div className="px-5 py-5 flex items-center gap-3 border-b border-stone-200/70">
+        <div className="h-10 w-10 shrink-0 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
           <HeartPulse className="h-5 w-5" />
         </div>
-        <div>
-          <p className="font-head font-semibold text-stone-900 leading-tight">Klinik Bidan</p>
-          <p className="text-xs text-stone-500">Sistem Informasi</p>
+        <div className="flex flex-col min-w-0">
+          <p className="font-head font-bold text-stone-900 leading-tight">My Klinik</p>
+          <p className="text-[11px] text-stone-500 leading-tight">Portal Pelayanan Pasien Digital</p>
+          <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-stone-100 text-[11px] font-medium text-stone-700 w-fit border border-stone-200/70">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Bidan Kominasari, S.Tr.Keb
+          </div>
         </div>
       </div>
+
+      {/* Navigasi Menu */}
       <nav className="flex-1 px-3 py-5 space-y-1">
         {NAV.map((n) => (
           <NavLink
@@ -66,6 +73,8 @@ export default function Layout() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Profil User & Tombol Keluar */}
       <div className="px-3 py-4 border-t border-stone-200/70">
         <div className="px-3 py-2 mb-2">
           <p className="text-sm font-medium text-stone-800 truncate">{user?.name || "Pengguna"}</p>
@@ -106,12 +115,13 @@ export default function Layout() {
         </div>
       )}
 
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-stone-200 bg-card">
           <button onClick={() => setOpen(true)} data-testid="menu-button">
             <Menu className="h-6 w-6 text-stone-700" />
           </button>
-          <span className="font-head font-semibold">Klinik Bidan</span>
+          <span className="font-head font-semibold">My Klinik</span>
         </header>
         <main className="flex-1 p-5 sm:p-8 max-w-[1400px] w-full mx-auto">
           <Outlet />
