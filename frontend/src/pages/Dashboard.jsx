@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Baby, Stethoscope, Wallet, AlertCircle, Pill, RefreshCw } from "lucide-react";
 import {
@@ -10,6 +10,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/apiClient";
 import { rupiah, tanggalPendek } from "@/lib/format";
 import { Card } from "@/components/ui/card";
@@ -36,19 +37,32 @@ const StatCard = ({ icon: Icon, label, value, sub, tint, delay, testid }) => (
 );
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [s, setS] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const retryCount = useRef(0);
 
   const fetchStats = () => {
     setLoading(true);
     setError(null);
+
     api.get("/dashboard/stats")
       .then((r) => {
         setS(r.data);
+        retryCount.current = 0;
       })
       .catch((err) => {
+        // Toleransi race condition cookie: coba ulangi otomatis 1x jika 401 saat inisialisasi
+        if (err.response?.status === 401 && retryCount.current < 1) {
+          retryCount.current += 1;
+          setTimeout(() => {
+            fetchStats();
+          }, 800);
+          return;
+        }
+
         setError(err.response?.data?.message || err.message || "Gagal memuat data");
       })
       .finally(() => {
@@ -57,10 +71,14 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    // Jalankan request hanya saat status user sudah valid/terkonfirmasi
+    if (user !== null && user !== false) {
+      fetchStats();
+    }
+  }, [user]);
 
-  if (loading) {
+  // Jika auth masih diverifikasi atau sedang mengambil data
+  if (user === null || (loading && !s)) {
     return (
       <div className="flex items-center gap-2 text-stone-500 py-12">
         <RefreshCw className="h-4 w-4 animate-spin" />
@@ -69,6 +87,7 @@ export default function Dashboard() {
     );
   }
 
+  // Tampilan error dengan tombol refresh
   if (error || !s) {
     return (
       <div className="py-12 text-center max-w-sm mx-auto">
@@ -159,48 +178,4 @@ export default function Dashboard() {
           </Card>
           <Card className="p-5 border-stone-200 fade-up" style={{ animationDelay: "300ms" }}>
             <div className="flex items-center gap-2 text-stone-700">
-              <Pill className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Jenis Obat Tersedia</span>
-            </div>
-            <p className="font-head text-2xl font-semibold text-stone-900 mt-2">{s.total_drugs || 0}</p>
-            <p className="text-xs text-stone-500 mt-1">Item dalam daftar obat</p>
-          </Card>
-        </div>
-      </div>
-
-      <Card className="mt-6 p-6 border-stone-200 fade-up" style={{ animationDelay: "340ms" }}>
-        <h3 className="font-head text-lg font-semibold text-stone-900 mb-4">Kunjungan Terbaru</h3>
-        {!s.recent_visits || s.recent_visits.length === 0 ? (
-          <p className="text-stone-400 text-sm py-8 text-center">Belum ada kunjungan</p>
-        ) : (
-          <div className="divide-y divide-stone-100">
-            {s.recent_visits.map((v) => (
-              <div
-                key={v.id}
-                className="flex items-center justify-between py-3 cursor-pointer hover:bg-stone-50 -mx-2 px-2 rounded-md"
-                onClick={() => navigate(`/pasien/${v.patient_id}`)}
-                data-testid={`recent-visit-${v.id}`}
-              >
-                <div>
-                  <p className="font-medium text-stone-800">{v.patient_name}</p>
-                  <p className="text-xs text-stone-500">
-                    {v.diagnosa || v.keluhan || "Pemeriksaan"} • {tanggalPendek(v.tanggal)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-stone-700">{rupiah(v.total || 0)}</span>
-                  <Badge
-                    variant={v.status_bayar === "Lunas" ? "default" : "secondary"}
-                    className={v.status_bayar === "Lunas" ? "bg-primary" : "bg-amber-100 text-amber-700"}
-                  >
-                    {v.status_bayar}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-    </div>
-  );
-}
+              <Pill className="h-4 w-4 text-primary"
