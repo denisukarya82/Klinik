@@ -138,10 +138,10 @@ export default function Billing() {
         </Table>
       </Card>
 
-      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+      <Dialog open={Boolean(detail)} onOpenChange={(o) => { if (!o) setDetail(null); }}>
         <DialogContent className="max-w-md">
           {detail && (
-            <>
+            <div>
               <DialogHeader>
                 <div className="flex items-center justify-between">
                   <DialogTitle className="font-head">Detail Tagihan</DialogTitle>
@@ -167,7 +167,7 @@ export default function Billing() {
                 </div>
 
                 <div className="rounded-lg border border-stone-200 divide-y divide-stone-100 max-h-56 overflow-y-auto">
-                  {(detail.items && detail.items.length > 0) ? (
+                  {detail.items && detail.items.length > 0 ? (
                     detail.items.map((it, i) => (
                       <div key={i} className="flex justify-between items-center px-3 py-2 text-sm">
                         <span className="text-stone-700">
@@ -211,19 +211,21 @@ export default function Billing() {
 
               {detail.status !== "Lunas" && (
                 <DialogFooter>
-                  <Button 
-                    onClick={pay} 
-                    disabled={isPaying} 
-                    className="w-full bg-primary hover:bg-[#47644D]" 
+                  <Button
+                    onClick={pay}
+                    disabled={isPaying}
+                    className="w-full bg-primary hover:bg-[#47644D]"
                     data-testid="confirm-payment-button"
                   >
-                    <CheckCircle2 className="h-4 w-4 mr-2" /> 
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
                     {isPaying ? "Memproses..." : "Tandai Lunas"}
                   </Button>
                 </DialogFooter>
               )}
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
