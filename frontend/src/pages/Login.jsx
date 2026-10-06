@@ -80,27 +80,54 @@ export default function Login() {
                 required
                 data-testid="login-email"
                 className="mt-1.5"
-              />Ada satu kesalahan kecil yang bisa menyebabkan build gagal: **`import { Link } from "react-router-dom"` tertulis dua kali** (di baris 2 dan baris 9).
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Kata Sandi</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                data-testid="login-password"
+                className="mt-1.5"
+              />
+            </div>
+          </div>
 
-Selain itu, tautan pendaftaran **"Belum punya akun? Daftar sekarang"** bisa dipasang di bawah opsi lupa sandi.
+          <Button
+            type="submit"
+            disabled={loading}
+            data-testid="login-submit-button"
+            className="w-full mt-6 bg-primary hover:bg-[#47644D]"
+          >
+            {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            Masuk
+          </Button>
 
-Berikut kode lengkap `Login.jsx` yang sudah dibersihkan dan ditambahkan tautan pendaftaran:
-
-```jsx
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { HeartPulse, Loader2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { formatApiErrorDetail } from "@/lib/apiClient";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
-const HERO =
-  "[https://images.unsplash.com/photo-1758654860024-9e352f70d1f9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBtZWRpY2FsJTIwY2xpbmljJTIwd2FpdGluZyUyMHJvb20lMjB3YXJtfGVufDB8fHx8MTc5MTIyNTU3NXww&ixlib=rb-4.1.0&q=85](https://images.unsplash.com/photo-1758654860024-9e352f70d1f9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBtZWRpY2FsJTIwY2xpbmljJTIwd2FpdGluZyUyMHJvb20lMjB3YXJtfGVufDB8fHx8MTc5MTIyNTU3NXww&ixlib=rb-4.1.0&q=85)";
-
-export default function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-stone-500 hover:text-stone-800"
+              data-testid="forgot-password-link"
+            >
+              Lupa kata sandi?
+            </Link>
+            <p className="text-sm text-stone-500">
+              Belum punya akun?{" "}
+              <Link
+                to="/register"
+                className="text-primary font-semibold hover:underline"
+                data-testid="register-link"
+              >
+                Daftar sekarang
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
