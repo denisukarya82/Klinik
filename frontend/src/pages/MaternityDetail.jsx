@@ -242,7 +242,6 @@ export default function MaternityDetail() {
         </Card>
       </div>
 
-      {/* ANC Dialog */}
       <Dialog open={ancOpen} onOpenChange={setAncOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -291,7 +290,6 @@ export default function MaternityDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Delivery Dialog */}
       <Dialog open={delOpen} onOpenChange={setDelOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -305,4 +303,64 @@ export default function MaternityDetail() {
             <div>
               <Label>Jenis Persalinan</Label>
               <Select value={del.jenis_persalinan} onValueChange={(v) => setDel((f) => ({ ...f, jenis_persalinan: v }))}>
-                <SelectTrigger className
+                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Normal">Normal (Spontan)</SelectItem>
+                  <SelectItem value="SC">Sectio Caesarea (SC)</SelectItem>
+                  <SelectItem value="Vakum">Vakum</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Tempat</Label>
+              <Input value={del.tempat} onChange={sd("tempat")} className="mt-1.5" />
+            </div>
+            <div>
+              <Label>Penolong</Label>
+              <Input value={del.penolong} onChange={sd("penolong")} className="mt-1.5" />
+            </div>
+            <div className="col-span-2 border-t border-stone-100 pt-3 mt-1">
+              <p className="text-sm font-semibold text-stone-700">Data Bayi</p>
+            </div>
+            <div>
+              <Label>Nama Bayi</Label>
+              <Input value={del.bayi_nama} onChange={sd("bayi_nama")} className="mt-1.5" />
+            </div>
+            <div>
+              <Label>Jenis Kelamin</Label>
+              <Select value={del.bayi_jenis_kelamin} onValueChange={(v) => setDel((f) => ({ ...f, bayi_jenis_kelamin: v }))}>
+                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                  <SelectItem value="Perempuan">Perempuan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Berat (gram)</Label>
+              <Input type="number" value={del.bayi_berat} onChange={sd("bayi_berat")} className="mt-1.5" />
+            </div>
+            <div>
+              <Label>Panjang (cm)</Label>
+              <Input type="number" value={del.bayi_panjang} onChange={sd("bayi_panjang")} className="mt-1.5" />
+            </div>
+            <div>
+              <Label>APGAR Score</Label>
+              <Input value={del.apgar} onChange={sd("apgar")} placeholder="cth: 9/10" className="mt-1.5" />
+            </div>
+            <div className="col-span-2">
+              <Label>Catatan</Label>
+              <Textarea value={del.catatan} onChange={sd("catatan")} rows={2} className="mt-1.5" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDelOpen(false)}>Batal</Button>
+            <Button onClick={saveDelivery} disabled={isSubmitting} className="bg-primary hover:bg-[#47644D]" data-testid="save-delivery-button">
+              {isSubmitting ? "Menyimpan..." : "Simpan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
